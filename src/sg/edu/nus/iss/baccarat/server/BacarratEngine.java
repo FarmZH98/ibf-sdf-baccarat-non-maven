@@ -3,7 +3,6 @@ package sg.edu.nus.iss.baccarat.server;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -50,7 +49,6 @@ public class BacarratEngine {
 
 
     private void writeCardsIntoFile(File cardsDB) {
-        System.out.println("Writing cards into file");
         OutputStream os = null;
         OutputStreamWriter osw = null;
         BufferedWriter bw = null;
@@ -79,12 +77,13 @@ public class BacarratEngine {
 
     //Read the contents of file, and write back into file. Only record 6 results per row
     private void writeWinnerIntoFile() {
-        System.out.println("Writing winner into file");
+        System.out.println("testing write winner into file");
         try {
             File game_historyFile = new File(GAME_HISTORY_FILE);
             if(!game_historyFile.exists()) {
                 game_historyFile.createNewFile();
             }
+            System.out.println("test a");
 
             BufferedReader br = new BufferedReader(new FileReader(GAME_HISTORY_FILE));
             List<String> lines = new ArrayList<>();
@@ -95,18 +94,20 @@ public class BacarratEngine {
                 line = br.readLine();
             }
 
+            System.out.println("test b");
             String lastline = "";
             if(lines.size() > 0) {
                 lastline = lines.get(lines.size()-1);
             }
             
             //long commaCount = 2;
-            int commaCount = lastline.length() - lastline.replace("m", "").length();
+            int commaCount = lastline.length() - lastline.replace(",", "").length();
             // long commaCount = lastline.chars()
             //                             .filter(ch -> ch == ',') //vs code glitch?
             //                             .count(); 
             char winnerUpperCase = Character.toUpperCase(this.currentWinner);
 
+            System.out.println("test c");
             FileWriter fw = new FileWriter(GAME_HISTORY_FILE, true);
             BufferedWriter bw = new BufferedWriter(fw);
             if(commaCount < 5 && lines.size() > 0) {
@@ -117,6 +118,7 @@ public class BacarratEngine {
                 lines.add(Character.toString(winnerUpperCase));
                 bw.write("\n" + winnerUpperCase);
             }
+            System.out.println("test d");
 
             br.close();
             bw.flush();
@@ -128,8 +130,6 @@ public class BacarratEngine {
             e.printStackTrace();
         }
     }
-
-    
 
     public char getCurrentWinner() {
         System.out.println("Current/Last winner is: " + currentWinner);
@@ -163,7 +163,7 @@ public class BacarratEngine {
         if(this.playerHand >= 8 || this.bankerHand >= 8) {
             this.currentWinner = determineWinner(playerHand, bankerHand);
             writeCardsIntoFile(cardsDB);
-            writeWinnerIntoFile();
+            //writeWinnerIntoFile(); //migrate this function to client
             return replytoClient(playerCard1, playerCard2, playerCard3, bankerCard1, bankerCard2, bankerCard3);
         }
 
@@ -190,8 +190,11 @@ public class BacarratEngine {
             System.out.println("Cards are finished. Reshuffle the cards again.");
         }
 
+        System.out.println("test 1");
         writeCardsIntoFile(cardsDB);
-        writeWinnerIntoFile();
+        System.out.println("test 2");
+        //writeWinnerIntoFile();
+        System.out.println("test 3");
 
         return replytoClient(playerCard1, playerCard2, playerCard3, bankerCard1, bankerCard2, bankerCard3);
     }

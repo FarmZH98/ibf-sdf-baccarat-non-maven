@@ -2,13 +2,19 @@ package sg.edu.nus.iss.baccarat.client;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.Console;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClientApp {
@@ -32,15 +38,6 @@ public class ClientApp {
                 if (input.equals("close")) {
                     break;
                 } 
-                // move below to server
-                // else if (input.startsWith("login")) { 
-                //     String[] loginDetails = input.split(" ");
-                //     String username = loginDetails[1];
-                //     int money = Integer.parseInt(loginDetails[2]);
-                //     db = new userDB(username, money);
-                //     System.out.println("Welcome " + username + "! You have logged in.");
-                //     continue;
-                // }
                 
                 Socket socket = new Socket(connInfo[0], Integer.parseInt(connInfo[1]));
                 is = socket.getInputStream();
@@ -73,13 +70,18 @@ public class ClientApp {
                     System.out.println(response);
                     System.out.println("Player Hand: " + playerHand);
                     System.out.println("Banker Hand: " + bankerHand);
+                    char winner;
                     if(playerHand > bankerHand) {
                         System.out.println("Player wins with " + playerHand + " points.");
+                        winner = 'P';
                     } else if (playerHand < bankerHand) {
                         System.out.println("Banker wins with " + bankerHand + " points.");
+                        winner = 'B';
                     } else {
                         System.out.println("It is a tie.");
+                        winner = 'T';
                     }
+                    writeWinnerIntoFile(winner);
                 } else {
                     System.err.println(response);
                 }
@@ -94,4 +96,58 @@ public class ClientApp {
         }
 
     }
+    //Read the contents of file, and write back into file. Only record 6 results per row
+    private static void writeWinnerIntoFile(char winner) {
+        String GAME_HISTORY_FILE =  "game_history.csv";
+
+        try {
+            File game_historyFile = new File(GAME_HISTORY_FILE);
+            if(!game_historyFile.exists()) {
+                game_historyFile.createNewFile();
+            }
+
+            BufferedReader br = new BufferedReader(new FileReader(GAME_HISTORY_FILE));
+            List<String> lines = new ArrayList<>();
+            String line = br.readLine();
+
+            while(line != null) {
+                lines.add(line);
+                line = br.readLine();
+            }
+
+            String lastline = "";
+            if(lines.size() > 0) {
+                lastline = lines.get(lines.size()-1);
+            }
+            
+            //long commaCount = 2;
+            int commaCount = lastline.length() - lastline.replace(",", "").length();
+            // long commaCount = lastline.chars()
+            //                             .filter(ch -> ch == ',') //vs code glitch?
+            //                             .count(); 
+            char winnerUpperCase = Character.toUpperCase(winner);
+
+            FileWriter fw = new FileWriter(GAME_HISTORY_FILE, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            if(commaCount < 5 && lines.size() > 0) {
+                lastline += "," + winnerUpperCase;
+                lines.set(lines.size()-1, lastline);
+                bw.write("," + winnerUpperCase);
+            } else {
+                lines.add(Character.toString(winnerUpperCase));
+                bw.write("\n" + winnerUpperCase);
+            }
+
+            br.close();
+            bw.flush();
+            bw.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+    }
 }
+

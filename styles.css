@@ -1,0 +1,21 @@
+body {
+    background-color: antiquewhite;
+}
+
+.tie {
+    color: green;
+}
+
+.banker {
+    color: blue;
+}
+
+.player {
+    color: red;
+}
+
+table {
+    border: 0.5px solid;
+    border-color: black;
+    width: 150px;
+}

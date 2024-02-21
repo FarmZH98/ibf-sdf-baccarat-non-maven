@@ -3,3 +3,4 @@ bin/
 *.csv
 lib/
 .vscode/
+.vercel

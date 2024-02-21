@@ -18,8 +18,6 @@ public class NetworkIO {
     private BufferedOutputStream bos;
     private DataOutputStream dos;
 
-    private String request;
-
     public NetworkIO(Socket socket) throws IOException {
         this.is = socket.getInputStream();
         this.bis = new BufferedInputStream(is);

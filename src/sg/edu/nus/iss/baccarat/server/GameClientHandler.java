@@ -7,7 +7,7 @@ public class GameClientHandler implements Runnable {
     private Socket socket;
     private BacarratEngine gameEngine;
     private static userDB db = null;
-    private static int betAmount = 0; //this should be migrated to userDB so we can have multiple users with different bet amount
+    private static int betAmount = 0; //due to userDB and betAmount being static, even though we uses threads, we cannot support different users accessing the server. To run more, need to spawn runnable from this class instead of from serverapp
 
     public GameClientHandler(Socket socket, BacarratEngine gameEngine) {
         this.socket = socket;
@@ -35,16 +35,16 @@ public class GameClientHandler implements Runnable {
                 case "login": 
                     String username = requestDetails[1];
                     int money = Integer.parseInt(requestDetails[2]);
-                    this.db = new userDB(username, money);
+                    GameClientHandler.db = new userDB(username, money);
                     reply = request + "|OK";
                     break;
                 case "bet":
-                    this.betAmount = Integer.parseInt(requestDetails[1]);
-                    System.out.println(this.betAmount);
-                    int moneyInDB = this.db.getMoney();
-                    if(moneyInDB < this.betAmount) {
+                    GameClientHandler.betAmount = Integer.parseInt(requestDetails[1]);
+                    System.out.println(GameClientHandler.betAmount);
+                    int moneyInDB = GameClientHandler.db.getMoney();
+                    if(moneyInDB < GameClientHandler.betAmount) {
                         reply = "Insufficient amount. Please place a lower bet or top up your balance.";
-                        this.betAmount = 0;
+                        GameClientHandler.betAmount = 0;
                     } else {
                         reply = request + "|OK";
                         //this.db.deductMoney(this.betAmount);
@@ -61,14 +61,14 @@ public class GameClientHandler implements Runnable {
                     char winner = this.gameEngine.getCurrentWinner();
 
                     if(Character.valueOf(winner).compareTo(Character.valueOf(dealSide.charAt(0))) == 0 ) {
-                        System.out.println("User wins " + this.betAmount);
-                        this.db.addMoney(this.betAmount);
+                        System.out.println("User wins " + GameClientHandler.betAmount);
+                        GameClientHandler.db.addMoney(GameClientHandler.betAmount);
                     } else if (winner == 't') {
-                        System.out.println("It is a tie. Bet amount of " + this.betAmount + " returned to user.");
+                        System.out.println("It is a tie. Bet amount of " + GameClientHandler.betAmount + " returned to user.");
                         //do nothing
                     } else {
-                        System.out.println("User loses " + this.betAmount);
-                        this.db.deductMoney(this.betAmount);
+                        System.out.println("User loses " + GameClientHandler.betAmount);
+                        GameClientHandler.db.deductMoney(GameClientHandler.betAmount);
                     }
                     break;
                 default:
