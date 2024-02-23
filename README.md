@@ -12,18 +12,15 @@ java -cp bin sg.edu.nus.iss.baccarat.client.ClientApp localhost:12345
 
 compile jar file in bin folder:
 ```
-jar -c -v -f Baccarat.jar .
+jar -c -v -f Baccarat.jar -e sg.edu.nus.iss.baccarat .
 ```
 
-Note:
+Run:
 - Unable to run the jar files using command below. 
 ```
 java -cp bin/Baccarat.jar sg.edu.nus.iss.baccarat.server.ServerApp 12345 2
+java -cp bin/Baccarat.jar sg.edu.nus.iss.baccarat.client.ClientApp localhost:12345
 ```
-
-Error: LinkageError occurred while loading main class sg.edu.nus.iss.baccarat.server.ServerApp
-        java.lang.UnsupportedClassVersionError: Preview features are not enabled for sg/edu/nus/iss/baccarat/server/ServerApp (class file version 65.65535). Try running with '--enable-preview'
-
 
 To compile and run test class at root level:
 ```
